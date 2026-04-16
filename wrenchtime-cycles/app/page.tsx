@@ -75,8 +75,8 @@ export default async function HomePage() {
         <span data-ngf-field="hero.eyebrow" className="text-[#38BDF8] text-sm font-semibold uppercase tracking-widest">
           {heroEyebrow}
         </span>
-        <h1 data-ngf-field="hero.headlinePrefix" className="text-5xl md:text-7xl font-extrabold tracking-tight leading-tight">
-          {heroHeadlinePrefix}<br />
+        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight leading-tight">
+          <span data-ngf-field="hero.headlinePrefix">{heroHeadlinePrefix}</span><br />
           <span data-ngf-field="hero.headlineAccent" className="text-[#E97132]">{heroHeadlineAccent}</span>
         </h1>
         <p data-ngf-field="hero.description" className="text-gray-400 text-lg md:text-xl max-w-2xl">
