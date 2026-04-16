@@ -16,6 +16,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "WrenchTime Cycles",
   description: "Professional motorcycle service & repair. Book your appointment online.",
+    other: { 'ngf-public-api': 'https://app.ngfsystems.com/api/public/website' },
 };
 
 export default function RootLayout({
