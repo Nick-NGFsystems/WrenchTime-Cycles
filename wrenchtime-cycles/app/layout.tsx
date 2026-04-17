@@ -1,16 +1,18 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from '@clerk/nextjs'
-import { Geist, Geist_Mono } from "next/font/google";
+import { Rajdhani, Sora } from "next/font/google";
 import NgfEditBridge from '@/components/NgfEditBridge'
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const headingFont = Rajdhani({
+  variable: "--font-heading",
+  weight: ["500", "600", "700"],
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const bodyFont = Sora({
+  variable: "--font-body",
+  weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
 });
 
@@ -28,7 +30,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${headingFont.variable} ${bodyFont.variable} antialiased bg-[var(--bg)] text-[var(--text)]`}
       >
         <ClerkProvider>
           <NgfEditBridge />

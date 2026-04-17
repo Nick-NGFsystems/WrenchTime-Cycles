@@ -38,16 +38,20 @@ export default function BookingConfirmButton({ token }: BookingConfirmButtonProp
 
   return (
     <div className="space-y-3">
-      {error && <p className="text-sm text-red-400">{error}</p>}
+      {error && (
+        <p className="rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+          {error}
+        </p>
+      )}
       <button
         type="button"
         onClick={handleConfirm}
         disabled={loading}
-        className="w-full bg-[#E97132] hover:bg-[#d4612a] disabled:opacity-50 text-white font-bold px-8 py-4 rounded-xl text-lg transition-colors"
+        className="inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-[var(--accent)] px-8 py-4 text-sm font-semibold uppercase tracking-[0.1em] text-white transition-colors hover:bg-orange-500 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {loading ? 'Confirming...' : 'Confirm My Booking'}
       </button>
-      <p className="text-xs text-gray-500 text-center">
+      <p className="text-center text-xs uppercase tracking-[0.12em] text-slate-500">
         By confirming, you agree to drop off your bike at the scheduled time.
       </p>
     </div>

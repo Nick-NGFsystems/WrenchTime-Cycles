@@ -11,31 +11,32 @@ export default async function BookingLandingPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-950 text-white">
+    <main className="min-h-screen text-[var(--text)]">
       <SiteHeader showBookingCta={false} />
 
-      <section className="mx-auto max-w-3xl px-6 py-20">
-        <div className="rounded-2xl border border-gray-800 bg-gray-900 p-8 shadow-2xl shadow-black/20">
-          <span className="text-sm font-semibold uppercase tracking-[0.25em] text-[#38BDF8]">
+      <section className="mx-auto w-full max-w-4xl px-4 py-20 sm:px-6 lg:px-8">
+        <div className="panel bg-grid-tech relative overflow-hidden p-8 sm:p-10">
+          <div className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-cyan-300/15 blur-3xl" />
+          <span className="relative text-sm font-semibold uppercase tracking-[0.25em] text-cyan-200">
             Booking Portal
           </span>
-          <h1 className="mt-4 text-4xl font-extrabold tracking-tight">
+          <h1 className="relative mt-4 text-5xl font-bold tracking-tight text-white sm:text-6xl">
             You&apos;re signed in.
           </h1>
-          <p className="mt-4 text-lg text-gray-400">
+          <p className="relative mt-4 max-w-2xl text-lg text-slate-300">
             Use the booking link sent to you after approval to review your request and confirm your slot.
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center gap-4">
+          <div className="relative mt-8 flex flex-wrap items-center gap-3">
             <Link
               href="/"
-              className="rounded-lg bg-[#E97132] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#d4612a]"
+              className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[var(--accent)] px-6 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-orange-500"
             >
               Back to Home
             </Link>
             <Link
               href="/intake"
-              className="rounded-lg border border-gray-700 px-5 py-3 text-sm font-semibold text-white transition-colors hover:border-gray-500 hover:bg-gray-800"
+              className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[var(--line)] px-6 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-slate-200 transition-colors hover:border-cyan-300/50 hover:text-cyan-100"
             >
               Submit a New Request
             </Link>

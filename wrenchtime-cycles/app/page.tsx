@@ -54,86 +54,146 @@ export default async function HomePage() {
   const footerCopyright = content['footer.copyright'] ?? `© ${new Date().getFullYear()} WrenchTime Cycles. All rights reserved.`
 
   return (
-    <main className="min-h-screen bg-gray-950 text-white">
+    <main className="relative min-h-screen overflow-x-clip text-[var(--text)]">
+      <div className="pointer-events-none absolute inset-0 opacity-70">
+        <div className="absolute -left-24 top-24 h-72 w-72 rounded-full bg-cyan-300/15 blur-3xl" />
+        <div className="absolute right-0 top-56 h-80 w-80 rounded-full bg-orange-500/20 blur-3xl" />
+      </div>
+
       <SiteHeader />
 
-      {/* HERO */}
-      <section className="max-w-5xl mx-auto px-6 py-24 flex flex-col items-center text-center gap-6">
-        <span data-ngf-field="hero.eyebrow" className="text-[#38BDF8] text-sm font-semibold uppercase tracking-widest">
-          {heroEyebrow}
-        </span>
-        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight leading-tight">
-          <span data-ngf-field="hero.headlinePrefix">{heroHeadlinePrefix}</span><br />
-          <span data-ngf-field="hero.headlineAccent" className="text-[#E97132]">{heroHeadlineAccent}</span>
-        </h1>
-        <p data-ngf-field="hero.description" className="text-gray-400 text-lg md:text-xl max-w-2xl">
-          {heroDescription}
-        </p>
-        <Link
-          href="/intake"
-          data-ngf-field="hero.cta"
-          className="mt-4 bg-[#E97132] hover:bg-[#d4612a] text-white font-bold px-8 py-4 rounded-xl text-lg transition-colors"
-        >
-          {heroCta}
-        </Link>
+      <section className="relative mx-auto flex w-full max-w-6xl flex-col gap-12 px-4 pb-20 pt-14 sm:px-6 lg:px-8 lg:pt-20">
+        <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="space-y-7">
+            <span data-ngf-field="hero.eyebrow" className="brand-chip">
+              {heroEyebrow}
+            </span>
+
+            <h1 className="text-5xl font-bold leading-[0.94] text-white sm:text-6xl md:text-7xl lg:text-8xl">
+              <span data-ngf-field="hero.headlinePrefix">{heroHeadlinePrefix}</span>
+              <span className="block text-[var(--accent)]" data-ngf-field="hero.headlineAccent">
+                {heroHeadlineAccent}
+              </span>
+            </h1>
+
+            <p data-ngf-field="hero.description" className="max-w-2xl text-base text-slate-300 sm:text-lg">
+              {heroDescription}
+            </p>
+
+            <div className="flex flex-wrap items-center gap-3">
+              <Link
+                href="/intake"
+                data-ngf-field="hero.cta"
+                className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[var(--accent)] px-7 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-orange-500"
+              >
+                {heroCta}
+              </Link>
+              <Link
+                href="/#services"
+                className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[var(--line)] px-7 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-slate-200 transition-colors hover:border-cyan-300/60 hover:text-cyan-200"
+              >
+                See Services
+              </Link>
+            </div>
+          </div>
+
+          <div className="panel bg-grid-tech relative ride-shift overflow-hidden p-6 sm:p-8">
+            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-cyan-300 via-sky-500 to-[var(--accent)]" />
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-200">
+              Live Shop Snapshot
+            </p>
+            <div className="mt-6 space-y-4">
+              <div className="surface-2 rounded-xl border border-slate-700/50 p-4">
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Turnaround</p>
+                <p className="mt-2 text-3xl font-bold text-white">2-4 Days</p>
+                <p className="mt-1 text-sm text-slate-300">Typical service completion window.</p>
+              </div>
+              <div className="surface-2 rounded-xl border border-slate-700/50 p-4">
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Diagnostic Clarity</p>
+                <p className="mt-2 text-3xl font-bold text-white">100%</p>
+                <p className="mt-1 text-sm text-slate-300">Every estimate is reviewed before booking.</p>
+              </div>
+              <div className="surface-2 rounded-xl border border-slate-700/50 p-4">
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Booking Deposit</p>
+                <p className="mt-2 text-3xl font-bold text-[var(--accent)]">$25</p>
+                <p className="mt-1 text-sm text-slate-300">Applied directly to your final invoice.</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
-      {/* HOW IT WORKS */}
-      <section className="bg-gray-900 py-20 px-6">
-        <div className="max-w-5xl mx-auto">
-          <h2 data-ngf-field="how.title" className="text-3xl font-bold text-center mb-12">
-            {howTitle.split('Works')[0] || 'How It '}<span className="text-[#38BDF8]">{howTitle.includes('Works') ? 'Works' : howTitle}</span>
+      <section id="process" className="border-y border-[var(--line)] bg-slate-900/35 py-20">
+        <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
+          <h2 data-ngf-field="how.title" className="text-center text-4xl font-bold text-white sm:text-5xl">
+            {howTitle}
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
             {howSteps.map((item, index) => (
-              <div key={item.key} className="flex flex-col gap-3">
-                <span className="text-[#E97132] text-4xl font-extrabold">{item.key}</span>
-                <h3 data-ngf-field={`how.step${index + 1}.title`} className="text-white font-semibold text-lg">{item.title}</h3>
-                <p data-ngf-field={`how.step${index + 1}.desc`} className="text-gray-400 text-sm leading-relaxed">{item.desc}</p>
+              <div key={item.key} className="panel p-5">
+                <p className="text-3xl font-bold text-[var(--accent)]">{item.key}</p>
+                <h3 data-ngf-field={`how.step${index + 1}.title`} className="mt-4 text-2xl font-semibold leading-tight text-white">
+                  {item.title}
+                </h3>
+                <p data-ngf-field={`how.step${index + 1}.desc`} className="mt-3 text-sm leading-relaxed text-slate-300">
+                  {item.desc}
+                </p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* SERVICES */}
-      <section className="bg-gray-950 py-20 px-6">
-        <div className="max-w-5xl mx-auto">
-          <h2 data-ngf-field="services.title" className="text-3xl font-bold text-center mb-12">
+      <section id="services" className="py-20">
+        <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
+          <h2 data-ngf-field="services.title" className="text-center text-4xl font-bold text-white sm:text-5xl">
             {servicesTitle}
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <p className="mx-auto mt-4 max-w-3xl text-center text-sm uppercase tracking-[0.14em] text-slate-400">
+            Transparent labor pricing and straightforward recommendations.
+          </p>
+          <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {services.map((service, index) => (
               <div
                 key={service.name}
-                className="bg-gray-900 border border-gray-800 rounded-xl px-5 py-4 flex items-center justify-between"
+                className="panel flex h-full flex-col justify-between p-5"
               >
-                <span data-ngf-field={`services.item${index + 1}.name`} className="text-white font-medium">{service.name}</span>
-                <span data-ngf-field={`services.item${index + 1}.price`} className="text-[#38BDF8] text-sm font-semibold">{service.price}</span>
+                <span data-ngf-field={`services.item${index + 1}.name`} className="text-xl font-semibold text-white">
+                  {service.name}
+                </span>
+                <span data-ngf-field={`services.item${index + 1}.price`} className="mt-6 text-sm font-semibold uppercase tracking-[0.14em] text-cyan-200">
+                  {service.price}
+                </span>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* BOTTOM CTA */}
-      <section className="bg-gray-900 py-20 px-6 text-center">
-        <h2 data-ngf-field="bottomCta.title" className="text-3xl font-bold mb-4">{bottomTitle}</h2>
-        <p data-ngf-field="bottomCta.description" className="text-gray-400 mb-8">{bottomDescription}</p>
-        <Link
-          href="/intake"
-          data-ngf-field="bottomCta.button"
-          className="bg-[#E97132] hover:bg-[#d4612a] text-white font-bold px-8 py-4 rounded-xl text-lg transition-colors"
-        >
-          {bottomButton}
-        </Link>
+      <section className="px-4 pb-20 sm:px-6 lg:px-8">
+        <div className="mx-auto w-full max-w-5xl rounded-3xl border border-[var(--line)] bg-gradient-to-r from-slate-900/95 via-slate-900/90 to-cyan-950/50 p-8 text-center shadow-[0_18px_60px_rgba(0,0,0,0.42)] sm:p-12">
+          <h2 data-ngf-field="bottomCta.title" className="text-4xl font-bold text-white sm:text-5xl">
+            {bottomTitle}
+          </h2>
+          <p data-ngf-field="bottomCta.description" className="mx-auto mt-4 max-w-2xl text-slate-300">
+            {bottomDescription}
+          </p>
+          <Link
+            href="/intake"
+            data-ngf-field="bottomCta.button"
+            className="mt-8 inline-flex min-h-11 items-center justify-center rounded-xl bg-[var(--accent)] px-8 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-orange-500"
+          >
+            {bottomButton}
+          </Link>
+        </div>
       </section>
 
-      {/* FOOTER */}
-      <footer data-ngf-field="footer.copyright" className="border-t border-gray-800 py-8 px-6 text-center text-gray-600 text-sm">
+      <footer
+        data-ngf-field="footer.copyright"
+        className="border-t border-[var(--line)] px-6 py-10 text-center text-xs uppercase tracking-[0.16em] text-slate-500"
+      >
         {footerCopyright}
       </footer>
-
     </main>
   )
 }
