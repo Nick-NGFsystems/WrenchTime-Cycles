@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import SiteHeader from '@/components/layout/SiteHeader'
 import { getNgfContent } from '@/lib/ngf'
 
 export default async function HomePage() {
@@ -54,21 +55,7 @@ export default async function HomePage() {
 
   return (
     <main className="min-h-screen bg-gray-950 text-white">
-
-      {/* NAVBAR */}
-      <nav className="w-full px-6 py-4 flex items-center justify-between border-b border-gray-800">
-        <span className="text-xl font-bold tracking-tight">
-          <span className="text-[#38BDF8]">Wrench</span>
-          <span className="text-[#E97132]">Time</span>
-          <span className="text-white"> Cycles</span>
-        </span>
-        <Link
-          href="/intake"
-          className="bg-[#E97132] hover:bg-[#d4612a] text-white text-sm font-semibold px-5 py-2 rounded-lg transition-colors"
-        >
-          Book a Service
-        </Link>
-      </nav>
+      <SiteHeader />
 
       {/* HERO */}
       <section className="max-w-5xl mx-auto px-6 py-24 flex flex-col items-center text-center gap-6">

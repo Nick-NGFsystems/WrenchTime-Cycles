@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { db } from '@/lib/db'
 import BookingConfirmButton from '@/components/BookingConfirmButton'
+import SiteHeader from '@/components/layout/SiteHeader'
 
 interface BookingPageProps {
   params: Promise<{ token: string }>
@@ -21,8 +22,10 @@ export default async function BookingPage({ params }: BookingPageProps) {
   const alreadyConfirmed = request.status === 'confirmed'
 
   return (
-    <main className="min-h-screen bg-gray-950 text-white px-6 py-16">
-      <div className="max-w-2xl mx-auto space-y-8">
+    <main className="min-h-screen bg-gray-950 text-white">
+      <SiteHeader showBookingCta={false} />
+
+      <div className="mx-auto max-w-2xl space-y-8 px-6 py-16">
         <div>
           <Link href="/" className="text-[#38BDF8] text-sm hover:underline">
             ← Back to home
