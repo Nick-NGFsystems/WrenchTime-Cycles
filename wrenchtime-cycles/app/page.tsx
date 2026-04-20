@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import SiteHeader from '@/components/layout/SiteHeader'
-import { getNgfContent } from '@/lib/ngf'
+import { getNgfContent, getItems } from '@/lib/ngf'
 
 export default async function HomePage() {
   const content = await getNgfContent()
@@ -8,49 +8,45 @@ export default async function HomePage() {
   const heroEyebrow = content['hero.eyebrow'] ?? 'Motorcycle Service & Repair'
   const heroHeadlinePrefix = content['hero.headlinePrefix'] ?? 'Your Bike Deserves'
   const heroHeadlineAccent = content['hero.headlineAccent'] ?? 'Honest Work.'
-  const heroDescription = content['hero.description'] ?? 'WrenchTime Cycles handles everything from oil changes to full diagnostics. Every job is reviewed before it\'s booked - no guesswork, no wasted trips.'
+  const heroDescription = content['hero.description'] ?? 'WrenchTime Cycles handles everything from oil changes to full diagnostics. Every job is reviewed before it\'s booked — no guesswork, no wasted trips.'
   const heroCta = content['hero.cta'] ?? 'Request a Service'
 
-  const howTitle = content['how.title'] ?? 'How It Works'
-  const howSteps = [
-    {
-      key: '01',
-      title: content['how.step1.title'] ?? 'Submit a Request',
-      desc: content['how.step1.desc'] ?? 'Fill out a quick intake form describing your bike and what it needs.',
-    },
-    {
-      key: '02',
-      title: content['how.step2.title'] ?? 'Get Reviewed',
-      desc: content['how.step2.desc'] ?? 'Every request is personally reviewed before a booking slot is offered.',
-    },
-    {
-      key: '03',
-      title: content['how.step3.title'] ?? 'Pick Your Window',
-      desc: content['how.step3.desc'] ?? 'Once approved, choose a time range that works for your schedule.',
-    },
-    {
-      key: '04',
-      title: content['how.step4.title'] ?? 'Pay a Small Deposit',
-      desc: content['how.step4.desc'] ?? 'A $25 booking fee locks in your appointment and goes toward your total.',
-    },
+  const howTitle = contentW'how.title'] ?? 'How It Works'
+
+  // Dynamic steps from portal editor
+  const rawSteps = getItems(content, 'how.steps')
+  const howSteps = rawSteps.length > 0 ? rawSteps.map((s, i) => ({
+    key: String(i + 1).padStart(2, '0'),
+    title: s.title ?? '',
+    desc: s.desc ?? '',
+  })) : [
+    { key: '01', title: 'Submit a Request', desc: 'Fill out a quick intake form describing your bike and what it needs.' },
+    { key: '02', title: 'Get Reviewed', desc: 'Every request is personally reviewed before a booking slot is offered.' },
+    { key: '03', title: 'Pick Your Window', desc: 'Once approved, choose a time range that works for your schedule.' },
+    { key: '04', title: 'Pay a Small Deposit', desc: 'A $25 booking fee locks in your appointment and goes toward your total.' },
   ]
 
   const servicesTitle = content['services.title'] ?? 'What We Work On'
-  const services = [
-    { name: content['services.item1.name'] ?? 'Oil & Filter Service', price: content['services.item1.price'] ?? '$55 labor' },
-    { name: content['services.item2.name'] ?? 'Carburetor Service', price: content['services.item2.price'] ?? 'From $70' },
-    { name: content['services.item3.name'] ?? 'Valve Train Service', price: content['services.item3.price'] ?? 'From $95' },
-    { name: content['services.item4.name'] ?? 'Drivetrain Service', price: content['services.item4.price'] ?? 'From $100' },
-    { name: content['services.item5.name'] ?? 'Brake Service', price: content['services.item5.price'] ?? 'From $45' },
-    { name: content['services.item6.name'] ?? 'Component Installation', price: content['services.item6.price'] ?? 'From $30' },
-    { name: content['services.item7.name'] ?? 'Diagnostics / No-Start', price: content['services.item7.price'] ?? '$85 (applied to repair)' },
-    { name: content['services.item8.name'] ?? 'Pre-Purchase Inspection', price: content['services.item8.price'] ?? '$95' },
+
+  // Dynamic services from portal editor
+  const rawServices = getItems(content, 'services.items')
+  const services = rawServices.length > 0 ? rawServices.map(s => ({
+    name: s.name ?? '',
+    price: s.price ?? '',
+  })) : [
+    { name: 'Oil & Filter Service', price: '$55 labor' },
+    { name: 'Carburetor Service', price: 'From $80' },
+    { name: 'Valve Train Service', price: 'From $95' },
+    { name: 'Drivetrain Service', price: 'From $100' },
+    { name: 'Brake Service', price: 'From $45' },
+    { name: 'Component Installation', price: 'From $30' },
+    { name: 'Diagnostics / No-Start', price: '$85 (applied to repair)' },
+    { name: 'Pre-Purchase Inspection', price: '$95' },
   ]
 
   const bottomTitle = content['bottomCta.title'] ?? 'Ready to get started?'
   const bottomDescription = content['bottomCta.description'] ?? 'Submit a request and we\'ll take it from there.'
   const bottomButton = content['bottomCta.button'] ?? 'Request a Service'
-
   const footerCopyright = content['footer.copyright'] ?? `© ${new Date().getFullYear()} WrenchTime Cycles. All rights reserved.`
 
   return (
@@ -130,12 +126,12 @@ export default async function HomePage() {
           </h2>
           <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
             {howSteps.map((item, index) => (
-              <div key={item.key} className="panel p-5">
+              <div key={index} className="panel p-5">
                 <p className="text-3xl font-bold text-[var(--accent)]">{item.key}</p>
-                <h3 data-ngf-field={`how.step${index + 1}.title`} className="mt-4 text-2xl font-semibold leading-tight text-white">
+                <h3 data-ngf-field={`how.steps.${index}.title`} className="mt-4 text-2xl font-semibold leading-tight text-white">
                   {item.title}
                 </h3>
-                <p data-ngf-field={`how.step${index + 1}.desc`} className="mt-3 text-sm leading-relaxed text-slate-300">
+                <p data-ngf-field={`how.steps.${index}.desc`} className="mt-3 text-sm leading-relaxed text-slate-300">
                   {item.desc}
                 </p>
               </div>
@@ -154,14 +150,11 @@ export default async function HomePage() {
           </p>
           <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {services.map((service, index) => (
-              <div
-                key={service.name}
-                className="panel flex h-full flex-col justify-between p-5"
-              >
-                <span data-ngf-field={`services.item${index + 1}.name`} className="text-xl font-semibold text-white">
+              <div key={index} className="panel flex h-full flex-col justify-between p-5">
+                <span data-ngf-field={`services.items.${index}.name`} className="text-xl font-semibold text-white">
                   {service.name}
                 </span>
-                <span data-ngf-field={`services.item${index + 1}.price`} className="mt-6 text-sm font-semibold uppercase tracking-[0.14em] text-cyan-200">
+                <span data-ngf-field={`services.items.${index}.price`} className="mt-6 text-sm font-semibold uppercase tracking-[0.14em] text-cyan-200">
                   {service.price}
                 </span>
               </div>
