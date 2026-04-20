@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+	:root {
+		--bg: #090c12;
+		--surface: #111827;
+		--surface-2: #151d2f;
+		--text: #eaf2ff;
+		--muted: #98a4bd;
+		--line: #26334d;
+		--brand: #33d6ff;
+		--accent: #ff6b2b;
+	}
+
+	* {
+		@apply border-transparent;
+	}
+
+	body {
+		font-family: var(--font-body), sans-serif;
+		min-height: 100vh;
+		background:
+			radial-gradient(circle at 15% 10%, rgba(51, 214, 255, 0.13), transparent 40%),
+			radial-gradient(circle at 82% 18%, rgba(255, 107, 43, 0.16), transparent 45%),
+			linear-gradient(180deg, #090c12 0%, #0c1018 45%, #090c12 100%);
+	}
+
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		font-family: var(--font-heading), sans-serif;
+		letter-spacing: 0.01em;
+	}
+}
+
+@layer utilities {
+	.bg-grid-tech {
+		background-image:
+			linear-gradient(to right, rgba(152, 164, 189, 0.08) 1px, transparent 1px),
+			linear-gradient(to bottom, rgba(152, 164, 189, 0.08) 1px, transparent 1px);
+		background-size: 24px 24px;
+	}
+
+	.panel {
+		@apply rounded-2xl border shadow-[0_16px_48px_rgba(0,0,0,0.32)] backdrop-blur-sm;
+		border-color: var(--line);
+		background-color: rgba(17, 24, 39, 0.85);
+	}
+
+	.brand-chip {
+		@apply inline-flex items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-cyan-200;
+	}
+
+	.text-muted {
+		color: var(--muted);
+	}
+
+	.surface-2 {
+		background-color: var(--surface-2);
+	}
+
+	.ride-shift {
+		animation: ride-shift 11s ease-in-out infinite;
+	}
+
+	@keyframes ride-shift {
+		0%,
+		100% {
+			transform: translateY(0px);
+		}
+		50% {
+			transform: translateY(-8px);
+		}
+	}
+}
