@@ -11,7 +11,7 @@ export default async function HomePage() {
   const heroDescription = content['hero.description'] ?? 'WrenchTime Cycles handles everything from oil changes to full diagnostics. Every job is reviewed before it\'s booked — no guesswork, no wasted trips.'
   const heroCta = content['hero.cta'] ?? 'Request a Service'
 
-  const howTitle = contentW'how.title'] ?? 'How It Works'
+  const howTitle = content['how.title'] ?? 'How It Works'
 
   // Dynamic steps from portal editor
   const rawSteps = getItems(content, 'how.steps')
