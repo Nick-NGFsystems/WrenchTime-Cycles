@@ -75,12 +75,18 @@ export default function NgfEditBridge() {
         if (attr) {
           const dot = attr.indexOf('.')
           if (dot > -1) {
+            const rect = target.getBoundingClientRect()
             window.parent.postMessage(
               {
                 type: 'fieldClick',
                 section: attr.substring(0, dot),
                 field: attr.substring(dot + 1),
                 currentValue: target.textContent?.trim() ?? '',
+                elementRect: {
+                  top: rect.top, left: rect.left,
+                  bottom: rect.bottom, right: rect.right,
+                  width: rect.width, height: rect.height,
+                },
               },
               '*'
             )
