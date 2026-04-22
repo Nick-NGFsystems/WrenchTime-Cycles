@@ -21,6 +21,19 @@ export default function NgfEditBridge() {
         background-color: rgba(59,130,246,0.06) !important;
       }
 
+      /* Empty field placeholder — keeps blank fields clickable in edit mode */
+      [data-ngf-edit="true"] [data-ngf-field]:empty {
+        min-height: 1.2em;
+        min-width: 60px;
+        display: inline-block;
+      }
+      [data-ngf-edit="true"] [data-ngf-field]:empty::before {
+        content: attr(data-ngf-label);
+        color: #94a3b8;
+        font-style: italic;
+        pointer-events: none;
+      }
+
       /* Block link/button navigation while editing */
       [data-ngf-edit="true"] a,
       [data-ngf-edit="true"] button {
