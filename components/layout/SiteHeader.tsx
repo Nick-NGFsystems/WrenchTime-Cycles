@@ -26,7 +26,10 @@ export default function SiteHeader({
 
   return (
     <header className="sticky top-0 z-40 border-b border-gray-100 bg-white/95 shadow-sm backdrop-blur-lg">
-      {/* Hidden color field anchors — scraped by portal editor for brand color pickers */}
+      {/* Hidden color field anchors — scraped by portal editor for brand
+          color pickers. The hex value is placed INSIDE the span so the
+          scraper and sidebar show the actual current color instead of an
+          empty box. */}
       <span
         data-ngf-field="brand.primaryColor"
         data-ngf-label="Primary Color"
@@ -34,7 +37,9 @@ export default function SiteHeader({
         data-ngf-section="Brand"
         aria-hidden="true"
         className="sr-only"
-      />
+      >
+        {primaryColor}
+      </span>
       <span
         data-ngf-field="brand.secondaryColor"
         data-ngf-label="Accent Color"
@@ -42,7 +47,9 @@ export default function SiteHeader({
         data-ngf-section="Brand"
         aria-hidden="true"
         className="sr-only"
-      />
+      >
+        {accentColor}
+      </span>
       <nav className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
 
         {/* Logo */}
