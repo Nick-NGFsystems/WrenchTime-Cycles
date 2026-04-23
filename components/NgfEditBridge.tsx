@@ -1,26 +1,26 @@
 'use client'
 import { useEffect } from 'react'
 
+/**
+ * NgfEditBridge — enables the NGF portal's live preview and click-to-edit.
+ * Must be included in app/layout.tsx. Do not remove.
+ */
 export default function NgfEditBridge() {
   useEffect(() => {
     let editMode = false
 
-    // Inject styles - only visible when edit mode is active (data-ngf-edit="true" on <html>)
     const style = document.createElement('style')
     style.id = 'ngf-edit-styles'
     style.textContent = `
-      /* Edit indicators - only shown while in portal editor */
       [data-ngf-edit="true"] [data-ngf-field] {
         outline: 1.5px dashed rgba(59,130,246,0.45) !important;
         border-radius: 3px;
         cursor: pointer !important;
       }
-
       [data-ngf-edit="true"] [data-ngf-field]:hover {
         outline-color: #3b82f6 !important;
         background-color: rgba(59,130,246,0.06) !important;
       }
-
       /* Empty field placeholder — keeps blank fields clickable in edit mode */
       [data-ngf-edit="true"] [data-ngf-field]:empty {
         min-height: 1.2em;
@@ -32,6 +32,14 @@ export default function NgfEditBridge() {
         color: #94a3b8;
         font-style: italic;
         pointer-events: none;
+      }
+      /* Pulse highlight when editor scrolls to a field */
+      [data-ngf-field].ngf-field-focus {
+        animation: ngfFieldFocus 1.6s ease-out;
+      }
+      @keyframes ngfFieldFocus {
+        0%   { outline-color: #3b82f6 !important; background-color: rgba(59,130,246,0.25) !important; }
+        100% { outline-color: rgba(59,130,246,0.45) !important; background-color: transparent !important; }
       }
 
       /* Navigation popup injected by NgfEditBridge */
@@ -83,11 +91,11 @@ export default function NgfEditBridge() {
       #ngf-nav-popup .ngf-go-btn:hover {
         background: #dbeafe;
       }
-      #ngf-nav-popup .ngf-stay-btn {
-        color: #6b7280;
+      #ngf-nav-popup .ngf-edit-btn {
+        color: #0f172a;
         background: transparent;
       }
-      #ngf-nav-popup .ngf-stay-btn:hover {
+      #ngf-nav-popup .ngf-edit-btn:hover {
         background: #f3f4f6;
       }
     `
@@ -101,7 +109,40 @@ export default function NgfEditBridge() {
       navPopup = null
     }
 
-    function showNavPopup(href: string, label: string, clientX: number, clientY: number) {
+    type EditTarget = {
+      section: string
+      field: string
+      value: string
+      rect: DOMRect
+    }
+
+    function postFieldClick(t: EditTarget) {
+      window.parent.postMessage(
+        {
+          type:    'fieldClick',
+          section: t.section,
+          field:   t.field,
+          currentValue: t.value,
+          elementRect: {
+            top:    t.rect.top,
+            left:   t.rect.left,
+            bottom: t.rect.bottom,
+            right:  t.rect.right,
+            width:  t.rect.width,
+            height: t.rect.height,
+          },
+        },
+        '*',
+      )
+    }
+
+    function showNavPopup(
+      href: string,
+      label: string,
+      clientX: number,
+      clientY: number,
+      editTarget?: EditTarget,
+    ) {
       dismissNavPopup()
 
       const popup = document.createElement('div')
@@ -122,21 +163,22 @@ export default function NgfEditBridge() {
       })
       popup.appendChild(goBtn)
 
-      const stayBtn = document.createElement('button')
-      stayBtn.className = 'ngf-nav-btn ngf-stay-btn'
-      stayBtn.textContent = 'Stay on page'
-      stayBtn.addEventListener('click', (ev) => {
-        ev.stopPropagation()
-        dismissNavPopup()
-      })
-      popup.appendChild(stayBtn)
+      if (editTarget) {
+        const editBtn = document.createElement('button')
+        editBtn.className = 'ngf-nav-btn ngf-edit-btn'
+        editBtn.textContent = '✎  Edit'
+        editBtn.addEventListener('click', (ev) => {
+          ev.stopPropagation()
+          dismissNavPopup()
+          postFieldClick(editTarget)
+        })
+        popup.appendChild(editBtn)
+      }
 
-      // Temporarily invisible to measure size
       popup.style.visibility = 'hidden'
       document.body.appendChild(popup)
       navPopup = popup
 
-      // Position near click, keep inside viewport
       const pw = popup.offsetWidth || 180
       const ph = popup.offsetHeight || 110
       const vw = window.innerWidth
@@ -150,111 +192,137 @@ export default function NgfEditBridge() {
       popup.style.visibility = ''
     }
 
-    // ── Signal parent ──────────────────────────────────────────────────────────
+    // ── Default-text cache ────────────────────────────────────────────────────
+    // Capture the server-rendered textContent of every annotated field on first
+    // sight. Stored on the element itself (dataset.ngfDefault) so it survives
+    // later DOM mutations. The editor sends empty strings (or omits keys) to
+    // mean "restore to default" — that only works if we remember the default.
+    function captureDefaults() {
+      document.querySelectorAll<HTMLElement>('[data-ngf-field]').forEach(el => {
+        if (el.dataset.ngfDefault === undefined) {
+          el.dataset.ngfDefault = el.textContent ?? ''
+        }
+      })
+    }
+    captureDefaults()
+
     window.parent.postMessage({ type: 'ngfReady' }, '*')
 
-    // ── Message handler ────────────────────────────────────────────────────────
     const messageHandler = (e: MessageEvent) => {
       if (e.data?.type === 'setEditMode') {
         editMode = !!e.data.enabled
         document.documentElement.setAttribute('data-ngf-edit', editMode ? 'true' : 'false')
+        // Re-run in case fields were hydrated after initial capture
+        captureDefaults()
         if (!editMode) dismissNavPopup()
       }
 
       if (e.data?.type === 'contentUpdate' && e.data.content) {
-        // Recursively flatten nested content (including arrays) and update
-        // every matching [data-ngf-field] element in the DOM.
-        function applyFlat(obj: Record<string, unknown>, prefix: string) {
-          for (const [key, value] of Object.entries(obj)) {
-            const path = prefix ? `${prefix}.${key}` : key
-            if (typeof value === 'string') {
-              const el = document.querySelector<HTMLElement>(`[data-ngf-field="${path}"]`)
-              if (el) el.textContent = value
-            } else if (Array.isArray(value)) {
-              value.forEach((item, i) => {
-                if (item && typeof item === 'object') {
-                  applyFlat(item as Record<string, unknown>, `${path}.${i}`)
-                }
-              })
-            } else if (value && typeof value === 'object') {
-              applyFlat(value as Record<string, unknown>, path)
+        const walk = (obj: unknown, path: string) => {
+          if (obj === null || obj === undefined) return
+          if (typeof obj === 'string') {
+            const el = document.querySelector<HTMLElement>(`[data-ngf-field="${path}"]`)
+            if (el) {
+              // Empty string = restore the original SSR text (the hardcoded
+              // fallback the page renders for an unpopulated field). A real
+              // user-entered value overwrites.
+              el.textContent = obj === '' ? (el.dataset.ngfDefault ?? '') : obj
+            }
+            return
+          }
+          if (Array.isArray(obj)) {
+            obj.forEach((item, i) => walk(item, `${path}.${i}`))
+            return
+          }
+          if (typeof obj === 'object') {
+            for (const [k, v] of Object.entries(obj as Record<string, unknown>)) {
+              walk(v, path ? `${path}.${k}` : k)
             }
           }
         }
-        applyFlat(e.data.content as Record<string, unknown>, '')
+        walk(e.data.content, '')
+      }
+
+      // Editor asks us to scroll the iframe to a specific field + flash it
+      if (e.data?.type === 'scrollToField' && typeof e.data.path === 'string') {
+        const el = document.querySelector<HTMLElement>(`[data-ngf-field="${e.data.path}"]`)
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          el.classList.remove('ngf-field-focus')
+          // Restart animation
+          void el.offsetWidth
+          el.classList.add('ngf-field-focus')
+          setTimeout(() => el.classList.remove('ngf-field-focus'), 1700)
+        }
       }
     }
 
-    // ── Click handler (capture phase) ─────────────────────────────────────────
+    // ── Click handler ─────────────────────────────────────────────────────────
     const clickHandler = (e: MouseEvent) => {
       if (!editMode) return
-
-      // Let clicks inside the nav popup through — the popup manages itself
       if (navPopup && navPopup.contains(e.target as Node)) return
-
-      // Dismiss popup when clicking anywhere else
       if (navPopup) dismissNavPopup()
 
       e.preventDefault()
       e.stopPropagation()
       e.stopImmediatePropagation()
 
-      // Walk up DOM looking for data-ngf-field first
-      let target = e.target as HTMLElement | null
-      while (target && target !== document.documentElement) {
-        const attr = target.getAttribute('data-ngf-field')
-        if (attr) {
-          const dot = attr.indexOf('.')
-          if (dot > -1) {
-            const rect = target.getBoundingClientRect()
-            window.parent.postMessage(
-              {
-                type: 'fieldClick',
-                section: attr.substring(0, dot),
-                field: attr.substring(dot + 1),
-                currentValue: target.textContent?.trim() ?? '',
-                elementRect: {
-                  top: rect.top, left: rect.left,
-                  bottom: rect.bottom, right: rect.right,
-                  width: rect.width, height: rect.height,
-                },
-              },
-              '*'
-            )
-          }
-          return
-        }
-        target = target.parentElement
+      // Single upward walk finds the nearest anchor AND nearest field.
+      let cursor: HTMLElement | null = e.target as HTMLElement | null
+      let anchor: HTMLAnchorElement | null = null
+      let fieldEl: HTMLElement | null = null
+      let buttonEl: HTMLButtonElement | null = null
+      while (cursor && cursor !== document.documentElement) {
+        const tag = cursor.tagName?.toLowerCase()
+        if (!anchor   && tag === 'a')                                anchor   = cursor as HTMLAnchorElement
+        if (!buttonEl && tag === 'button')                           buttonEl = cursor as HTMLButtonElement
+        if (!fieldEl  && cursor.getAttribute?.('data-ngf-field'))    fieldEl  = cursor
+        cursor = cursor.parentElement
       }
 
-      // No editable field found — check if a navigable link was clicked
-      target = e.target as HTMLElement | null
-      while (target && target !== document.documentElement) {
-        const tag = target.tagName?.toLowerCase()
-
-        if (tag === 'a') {
-          const anchor = target as HTMLAnchorElement
-          const href = anchor.getAttribute('href') ?? ''
-
-          if (href.startsWith('#')) {
-            // In-page anchor — scroll directly without popup
-            const id = href.slice(1)
-            document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
-          } else if (href && href !== '#') {
-            // Real navigation — show popup
-            const label = anchor.textContent?.trim() || anchor.getAttribute('aria-label') || 'Link'
-            showNavPopup(anchor.href, label, e.clientX, e.clientY)
+      // Build an EditTarget from the field element, if any
+      let editTarget: EditTarget | undefined
+      if (fieldEl) {
+        const attr = fieldEl.getAttribute('data-ngf-field') ?? ''
+        const dot = attr.indexOf('.')
+        if (dot > -1) {
+          editTarget = {
+            section: attr.substring(0, dot),
+            field:   attr.substring(dot + 1),
+            value:   fieldEl.textContent?.trim() ?? '',
+            rect:    fieldEl.getBoundingClientRect(),
           }
-          return
         }
-
-        if (tag === 'button') {
-          // Non-field button in edit mode — silently block (e.g. mobile menu toggle)
-          return
-        }
-
-        target = target.parentElement
       }
+
+      // Precedence:
+      //   1. Anchor (internal hash) → scroll, no popup (even if editable — feels disorienting)
+      //   2. Anchor (real href) → popup with Go to page + Edit (if editable)
+      //   3. Editable field outside any link → fire fieldClick directly
+      //   4. Button (no link, no field) → silently block (e.g. mobile menu toggle)
+
+      if (anchor) {
+        const href = anchor.getAttribute('href') ?? ''
+        if (href.startsWith('#')) {
+          const id = href.slice(1)
+          document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+          return
+        }
+        if (href && href !== '#') {
+          const label = anchor.textContent?.trim() || anchor.getAttribute('aria-label') || 'Link'
+          showNavPopup(anchor.href, label, e.clientX, e.clientY, editTarget)
+          return
+        }
+        // Anchor with no href — treat as plain editable (if any)
+      }
+
+      if (editTarget) {
+        postFieldClick(editTarget)
+        return
+      }
+
+      // Button click with nothing editable — just block
+      if (buttonEl) return
     }
 
     window.addEventListener('message', messageHandler)

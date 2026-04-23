@@ -5,13 +5,13 @@ import { getNgfContent, getItems } from '@/lib/ngf'
 export default async function HomePage() {
   const content = await getNgfContent()
 
-  const heroEyebrow = content['hero.eyebrow'] ?? 'Motorcycle Service & Repair'
-  const heroHeadlinePrefix = content['hero.headlinePrefix'] ?? 'Your Bike Deserves'
-  const heroHeadlineAccent = content['hero.headlineAccent'] ?? 'Honest Work.'
-  const heroDescription = content['hero.description'] ?? 'WrenchTime Cycles handles everything from oil changes to full diagnostics. Every job is reviewed before it\'s booked — no guesswork, no wasted trips.'
-  const heroCta = content['hero.cta'] ?? 'Request a Service'
+  const heroEyebrow = content['hero.eyebrow'] || 'Motorcycle Service & Repair'
+  const heroHeadlinePrefix = content['hero.headlinePrefix'] || 'Your Bike Deserves'
+  const heroHeadlineAccent = content['hero.headlineAccent'] || 'Honest Work.'
+  const heroDescription = content['hero.description'] || 'WrenchTime Cycles handles everything from oil changes to full diagnostics. Every job is reviewed before it\'s booked — no guesswork, no wasted trips.'
+  const heroCta = content['hero.cta'] || 'Request a Service'
 
-  const howTitle = content['how.title'] ?? 'How It Works'
+  const howTitle = content['how.title'] || 'How It Works'
 
   // Dynamic steps from portal editor
   const rawSteps = getItems(content, 'how.steps')
@@ -26,7 +26,7 @@ export default async function HomePage() {
     { key: '04', title: 'Pay a Small Deposit', desc: 'A $25 booking fee locks in your appointment and goes toward your total.' },
   ]
 
-  const servicesTitle = content['services.title'] ?? 'What We Work On'
+  const servicesTitle = content['services.title'] || 'What We Work On'
 
   // Dynamic services from portal editor
   const rawServices = getItems(content, 'services.items')
@@ -44,10 +44,10 @@ export default async function HomePage() {
     { name: 'Pre-Purchase Inspection', price: '$95' },
   ]
 
-  const bottomTitle = content['bottomCta.title'] ?? 'Ready to get started?'
-  const bottomDescription = content['bottomCta.description'] ?? 'Submit a request and we\'ll take it from there.'
-  const bottomButton = content['bottomCta.button'] ?? 'Request a Service'
-  const footerCopyright = content['footer.copyright'] ?? `© ${new Date().getFullYear()} WrenchTime Cycles. All rights reserved.`
+  const bottomTitle = content['bottomCta.title'] || 'Ready to get started?'
+  const bottomDescription = content['bottomCta.description'] || 'Submit a request and we\'ll take it from there.'
+  const bottomButton = content['bottomCta.button'] || 'Request a Service'
+  const footerCopyright = content['footer.copyright'] || `© ${new Date().getFullYear()} WrenchTime Cycles. All rights reserved.`
 
   return (
     <main className="relative min-h-screen overflow-x-clip text-[var(--text)]">

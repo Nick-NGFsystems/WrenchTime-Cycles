@@ -6,20 +6,20 @@ export default async function HomePage() {
   const content = await getNgfContent()
 
   // ── Brand ─────────────────────────────────────────────────────────────────
-  const businessName = content['brand.businessName']   ?? 'WrenchTime Cycles'
-  const tagline      = content['brand.tagline']        ?? 'Motorcycle Service & Repair'
-  const primary      = content['brand.primaryColor']   ?? '#33d6ff'
-  const accent       = content['brand.secondaryColor'] ?? '#ff6b2b'
+  const businessName = content['brand.businessName'] || 'WrenchTime Cycles'
+  const tagline      = content['brand.tagline'] || 'Motorcycle Service & Repair'
+  const primary      = content['brand.primaryColor'] || '#33d6ff'
+  const accent       = content['brand.secondaryColor'] || '#ff6b2b'
 
   // ── Hero ──────────────────────────────────────────────────────────────────
-  const eyebrow         = content['hero.eyebrow']        ?? tagline
-  const headlinePrefix  = content['hero.headlinePrefix'] ?? 'Your Bike Deserves'
-  const headlineAccent  = content['hero.headlineAccent'] ?? 'Honest Work.'
-  const description     = content['hero.description']    ?? 'WrenchTime Cycles handles everything from oil changes to full diagnostics. Every job is reviewed before it\'s booked — no guesswork, no wasted trips.'
-  const heroCta         = content['hero.cta']            ?? 'Request a Service'
+  const eyebrow         = content['hero.eyebrow'] || tagline
+  const headlinePrefix  = content['hero.headlinePrefix'] || 'Your Bike Deserves'
+  const headlineAccent  = content['hero.headlineAccent'] || 'Honest Work.'
+  const description     = content['hero.description'] || 'WrenchTime Cycles handles everything from oil changes to full diagnostics. Every job is reviewed before it\'s booked — no guesswork, no wasted trips.'
+  const heroCta         = content['hero.cta'] || 'Request a Service'
 
   // ── How It Works ──────────────────────────────────────────────────────────
-  const howTitle = content['how.title'] ?? 'How It Works'
+  const howTitle = content['how.title'] || 'How It Works'
   const rawSteps = getItems(content, 'how.steps')
   const howSteps = rawSteps.length > 0 ? rawSteps : [
     { title: 'Submit a Request', desc: 'Fill out a quick form describing your bike and what it needs.' },
@@ -29,7 +29,7 @@ export default async function HomePage() {
   ]
 
   // ── Services ──────────────────────────────────────────────────────────────
-  const servicesTitle = content['services.title'] ?? 'What We Work On'
+  const servicesTitle = content['services.title'] || 'What We Work On'
   const rawServices   = getItems(content, 'services.items')
   const services      = rawServices.length > 0 ? rawServices : [
     { name: 'Oil & Filter Service',    price: '$55 labor' },
@@ -43,12 +43,12 @@ export default async function HomePage() {
   ]
 
   // ── Bottom CTA ────────────────────────────────────────────────────────────
-  const ctaTitle       = content['bottomCta.title']       ?? 'Ready to get started?'
-  const ctaDescription = content['bottomCta.description'] ?? "Submit a request and we'll take it from there."
-  const ctaButton      = content['bottomCta.button']      ?? 'Request a Service'
+  const ctaTitle       = content['bottomCta.title'] || 'Ready to get started?'
+  const ctaDescription = content['bottomCta.description'] || "Submit a request and we'll take it from there."
+  const ctaButton      = content['bottomCta.button'] || 'Request a Service'
 
   // ── Footer ────────────────────────────────────────────────────────────────
-  const copyright = content['footer.copyright'] ?? `© ${new Date().getFullYear()} ${businessName}. All rights reserved.`
+  const copyright = content['footer.copyright'] || `© ${new Date().getFullYear()} ${businessName}. All rights reserved.`
 
   return (
     <div className="min-h-screen bg-white text-gray-900">
