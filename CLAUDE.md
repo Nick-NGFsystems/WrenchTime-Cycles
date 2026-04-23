@@ -100,3 +100,21 @@ wrenchtime-cycles/
   prisma/schema.prisma
   next.config.ts            ← CSP frame-ancestors for NGF portal
 ```
+
+---
+
+## Known Gaps / Integration Checklist
+
+Things that are shipped but **not verified end-to-end**, or known rough edges. Skim this before starting a multi-hour session — the last session already audited.
+
+| Area | Status | Notes |
+|---|---|---|
+| `ServiceRequest.tokenExpires` migration | ⚠️ Unverified | Commit `6d01a45` added the column to `prisma/schema.prisma` and generated `20260423070101_add_token_expires/migration.sql`. The SQL is correct (`ALTER TABLE "ServiceRequest" ADD COLUMN "tokenExpires" TIMESTAMP(3);`) but lands only at deploy time via Vercel's `prisma migrate deploy`. Run `./node_modules/.bin/prisma migrate dev` locally if you need to confirm. |
+| Booking middleware | ✅ Public | `middleware.ts` now whitelists `/booking(.*)` + `/api/booking(.*)` + `/api/intake(.*)` so Clerk doesn't challenge customers without accounts. |
+| `jobDuration` units | ✅ Fixed | `app/booking/[token]/page.tsx` now renders `day`/`days` (was `hrs` — the admin's value is days). |
+| Theme consistency | ⚠️ In progress | Homepage is light (Tailwind `bg-white`, `text-gray-900`). Intake + booking pages were dark (`text-white`, `var(--bg)`, `panel` class). Ported to light to match in commit after `6d01a45`. Legacy dark-theme CSS variables in `globals.css` may still be referenced by other code — audit before removing. |
+| Brand color sr-only anchors | ⚠️ Empty | `SiteHeader.tsx` has `<span data-ngf-field="brand.primaryColor" className="sr-only" />` with no inner content, so the editor sidebar shows the Brand color fields as empty. If you want the color swatch to show the live hex in the sidebar, put `{primaryColor}` inside the span (matches pattern used elsewhere). |
+| Bridge version | ⚠️ May lag | `components/NgfEditBridge.tsx` should match the latest in `NorthCoveBuilders-Mockup/components/NgfEditBridge.tsx`. Bridge updates are synced by hand; if you change editor contract, propagate to every client site. |
+| `<select><option>` editing | ❌ Not supported | Intake form dropdown options (`SERVICES` array, year/make/model suggestions) aren't editable through the NGF portal — the bridge can't intercept native option UI. |
+
+**When finishing a session, add or update an entry here for anything you committed but couldn't verify live.** Saves the next agent the audit-from-scratch round-trip.
