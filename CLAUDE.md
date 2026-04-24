@@ -1,8 +1,8 @@
 # WrenchTime Cycles — Project Notes
 
-This file covers WrenchTime-specific details. For universal NGFsystems standards (bridge contract, data-ngf-* attribute rules, postMessage protocol, security invariants) see the root [`NGF-Systems-app/CLAUDE.md`](https://github.com/Nick-NGFsystems/NGF-Systems-app/blob/main/CLAUDE.md). For the simplest reference implementation of the NGF editor integration (no auth, no external DB, just annotation patterns) see [`NorthCoveBuilders-Mockup/CLAUDE.md`](https://github.com/Nick-NGFsystems/NorthCoveBuilders-Mockup/blob/main/CLAUDE.md).
+**This file (the repo-root `CLAUDE.md`) is the canonical doc.** If you're reading a file at `wrenchtime-cycles/CLAUDE.md`, it should be a short pointer back here (see commit `<this one>`). A parallel Next.js app copy still lives in the `wrenchtime-cycles/` subdirectory from when the repo used a monorepo layout, but active development happens against the root — `app/`, `components/`, `lib/`, `prisma/`, `middleware.ts`, etc.
 
-The Next.js app lives in this `wrenchtime-cycles/` directory. Run all commands from here.
+For universal NGFsystems standards (bridge contract, data-ngf-* attribute rules, postMessage protocol, security invariants) see the root [`NGF-Systems-app/CLAUDE.md`](https://github.com/Nick-NGFsystems/NGF-Systems-app/blob/main/CLAUDE.md). For the simplest reference implementation of the NGF editor integration (no auth, no external DB, just annotation patterns) see [`NorthCoveBuilders-Mockup/CLAUDE.md`](https://github.com/Nick-NGFsystems/NorthCoveBuilders-Mockup/blob/main/CLAUDE.md).
 
 ---
 
@@ -132,6 +132,7 @@ Things that are shipped but **not verified end-to-end**, or known rough edges. S
 
 | Area | Status | Notes |
 |---|---|---|
+| Duplicate `wrenchtime-cycles/` subdir | ⚠️ Legacy, drifting | The repo contains a full parallel Next.js app under `wrenchtime-cycles/` that no recent commit has touched — but its `package.json`, `app/`, `components/`, etc. still exist and can confuse tools (editors, AI agents) into reading stale content. A small pointer `wrenchtime-cycles/CLAUDE.md` now lives in git so anyone resolving to that path lands on the root doc. If nothing in production depends on the subdir (verify Vercel project points at the root), delete it entirely in a dedicated commit. |
 | `ServiceRequest.tokenExpires` migration | ⚠️ Unverified against live DB | Commit `6d01a45` added the column + `20260423070101_add_token_expires/migration.sql` with `ALTER TABLE "ServiceRequest" ADD COLUMN "tokenExpires" TIMESTAMP(3);`. The SQL lands on Neon **only when Vercel next builds and runs `prisma migrate deploy`**. If you need it before a deploy, run `./node_modules/.bin/prisma migrate deploy` (prod DB) or `migrate dev` (shadow DB) locally. Every new migration has this same deploy-time caveat. |
 | Booking middleware | ✅ Public | `middleware.ts` whitelists `/booking(.*)` + `/api/booking(.*)` + `/api/intake(.*)` so Clerk doesn't challenge customers without accounts. Don't regress this — see "Middleware: public routes for customers without Clerk accounts" above. |
 | `jobDuration` units | ✅ Fixed | `app/booking/[token]/page.tsx` now renders `day`/`days` (was `hrs` — the admin's value is days). |
