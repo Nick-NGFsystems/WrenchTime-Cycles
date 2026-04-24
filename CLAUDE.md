@@ -1,6 +1,6 @@
 # WrenchTime Cycles — Project Notes
 
-This file covers WrenchTime-specific details. For universal NGFsystems standards, see `../CLAUDE.md`.
+This file covers WrenchTime-specific details. For universal NGFsystems standards (bridge contract, data-ngf-* attribute rules, postMessage protocol, security invariants) see the root [`NGF-Systems-app/CLAUDE.md`](https://github.com/Nick-NGFsystems/NGF-Systems-app/blob/main/CLAUDE.md). For the simplest reference implementation of the NGF editor integration (no auth, no external DB, just annotation patterns) see [`NorthCoveBuilders-Mockup/CLAUDE.md`](https://github.com/Nick-NGFsystems/NorthCoveBuilders-Mockup/blob/main/CLAUDE.md).
 
 The Next.js app lives in this `wrenchtime-cycles/` directory. Run all commands from here.
 
