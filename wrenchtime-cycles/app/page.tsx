@@ -318,7 +318,7 @@ export default async function HomePage() {
 
       {/* ── Who This Is For ── */}
       <section id="fit" className="px-4 py-20 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-6xl">
+        <div className="mx-auto max-w-4xl">
           <div className="text-center">
             <span className="brand-chip">The Right Fit</span>
             <h2 className="mt-4 text-3xl font-bold sm:text-4xl" style={{ color: 'var(--text)' }}>
@@ -326,44 +326,20 @@ export default async function HomePage() {
             </h2>
           </div>
 
-          <div className="mt-12 grid gap-6 lg:grid-cols-2">
-
-            {/* Who This Is For */}
-            <div className="panel p-8">
-              <h3 className="mb-6 text-lg font-semibold" style={{ color: 'var(--text)' }}>Good Fit</h3>
-              <ul className="space-y-4">
-                {[
-                  'Riders who value convenience and want service at their door',
-                  'Owners who want clear communication and confirmed scope before booking',
-                  'Bikes that need professional service without the shop hassle',
-                  'People who appreciate documented, reliable work they can trust',
-                ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-3">
-                    <span className="mt-0.5 shrink-0 text-sm font-bold" style={{ color: 'var(--brand)' }}>✓</span>
-                    <span className="text-sm leading-relaxed" style={{ color: 'var(--muted)' }}>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Not a Fit */}
-            <div className="panel p-8" style={{ borderColor: 'var(--line)' }}>
-              <h3 className="mb-6 text-lg font-semibold" style={{ color: 'var(--text)' }}>Not a Good Fit</h3>
-              <ul className="space-y-4">
-                {[
-                  'You\'re looking for the cheapest option — we\'re not competing on price',
-                  'You need same-day or emergency turnaround — we review every job first',
-                  'You want to walk through a DIY repair over the phone',
-                  'The job requires a full teardown or rebuild beyond what mobile allows',
-                ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-3">
-                    <span className="mt-0.5 shrink-0 text-sm font-bold" style={{ color: accent }}>✕</span>
-                    <span className="text-sm leading-relaxed" style={{ color: 'var(--muted)' }}>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
+          <div className="panel mt-12 p-8">
+            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {[
+                'Riders who want professional service at their door',
+                'Owners who value clear communication and confirmed scope',
+                'Bikes that deserve proper care without the shop hassle',
+                'People who appreciate documented, reliable work they can trust',
+              ].map((item, i) => (
+                <li key={i} className="flex items-start gap-3">
+                  <span className="mt-0.5 shrink-0 text-sm font-bold" style={{ color: 'var(--brand)' }}>✓</span>
+                  <span className="text-sm leading-relaxed" style={{ color: 'var(--muted)' }}>{item}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </section>
