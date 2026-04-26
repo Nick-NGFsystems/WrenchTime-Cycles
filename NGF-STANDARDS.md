@@ -6,31 +6,22 @@ Say: "I'm starting a new NGFsystems project. Follow these standards for everythi
 
 ---
 
-## HOW WE WORK — TWO AI SYSTEM
+## HOW WE WORK — COWORK MODE
 
-NGFsystems projects are built using a two-AI workflow:
-
-**You (Claude on claude.ai)** — the strategic AI. You plan features, make architecture decisions, debug issues, write messages to send to the other AI, and maintain the big picture. You do not directly edit code files.
-
-**The Codespace AI (GitHub Copilot or another Claude instance inside the GitHub Codespace)** — the execution AI. It has full access to the codebase, can read and write files, run terminal commands, execute builds, run migrations, and make direct changes to the project.
+NGFsystems projects are built using Claude in Cowork mode. Claude has direct access to the codebase through mounted workspace folders and a sandboxed Linux shell — it reads, writes, and runs commands directly without any relay.
 
 ### How the workflow operates:
-- Nick pastes your instructions into the Codespace AI and pastes its responses back to you
-- You write precise, detailed instructions for the Codespace AI to execute
-- The Codespace AI reports back what it did, what files it changed, and any errors
-- You interpret the results and decide the next step
-- When debugging, you ask the Codespace AI to run specific commands and report exact output
+- Claude reads the relevant CLAUDE.md files at the start of every session before touching code
+- Claude makes architecture decisions, writes code, runs migrations, and verifies builds autonomously
+- Nick reviews diffs and deployed output — he does not relay messages between AIs
+- Code is pushed to GitHub via `python3 github-push.py <repo-name> "<commit message>"` using the PAT in `github-push-config.json`
 
-### How to write instructions for the Codespace AI:
-- Be specific — include exact file paths, exact code blocks, exact commands to run
-- Always ask it to verify changes with `cat filename` after writing
-- Always ask it to run `npm run build` or a targeted error check after significant changes
-- If something fails, ask for the exact error output before suggesting a fix
-- Reference this standards file when needed — the Codespace AI should follow all the same rules
-
-### What to say to Nick when ready:
-Frame your message as something Nick can copy and paste directly into the Codespace AI. For example:
-> "Send this to the other AI: [your instructions]"
+### How Claude should work:
+- Read CLAUDE.md before starting any coding task
+- Check if a component, function, or route already exists before creating anything
+- Verify file writes by reading back after editing
+- Run `npm run build` or `npx tsc --noEmit` to confirm no TypeScript errors before pushing
+- Flag problems early — never silently skip a step or assume it will work
 
 ---
 
@@ -109,16 +100,17 @@ Every NGFsystems project follows this design language:
 ### Standard App Structure
 ```
 app/
-  (admin)/        — admin-only routes
-  (auth)/         — sign-in, sign-up
-  (portal)/       — client-only routes
+  (auth)/         — route group: sign-in, sign-up (shared layout)
+  admin/          — flat admin routes (not a route group)
+  portal/         — flat portal routes (not a route group)
   layout.tsx      — root layout with ClerkProvider
   page.tsx        — landing page
   redirect/       — role-based redirect after sign-in
   unauthorized/   — shown when wrong role tries to access a route
   api/
     admin/        — admin API routes
-    portal/       — client portal API routes
+    portal/       — portal API routes
+    public/       — public CORS endpoints (no auth)
     webhooks/     — Stripe and Clerk webhooks
 
 components/
@@ -131,20 +123,16 @@ lib/
   db.ts           — single Prisma instance
   auth.ts         — Clerk auth helpers
   stripe.ts       — single Stripe instance
-  utils.ts        — shared utilities
 
 prisma/
   schema.prisma   — single source of truth for all tables
-
-types/
-  index.ts        — all TypeScript interfaces
 ```
 
 ### Route Naming Rules
-- Admin routes: `/admin/dashboard`, `/admin/clients`, etc.
+- Admin routes: flat, e.g. `/admin/dashboard`, `/admin/clients`
 - Portal routes: always prefix with `portal-` → `/portal/portal-dashboard`, `/portal/portal-invoices`
 - Never name portal routes the same as admin routes — causes Next.js conflicts
-- Every route group folder must have a `layout.tsx` file
+- Only `(auth)/` uses a route group; admin and portal are flat directories
 
 ---
 
@@ -232,19 +220,15 @@ return NextResponse.json({ success: false, error: "message" }, { status: 400 })
 
 ## NEXT.JS CONFIG — STANDARD
 
+Keep it minimal. No `experimental` blocks, no `serverActions` config — these were removed. The config should only contain what is actually needed (e.g. security headers, image domains, CSP rules):
+
 ```javascript
 /** @type {import('next').NextConfig} */
-const nextConfig = {
-  experimental: {
-    serverActions: {
-      allowedOrigins: ['localhost:3000', '*.app.github.dev'],
-    },
-  },
-}
+const nextConfig = {}
 module.exports = nextConfig
 ```
 
-Remove the experimental block for production Vercel deployments.
+Client sites that need to be iframeable by the NGF portal editor must add a `Content-Security-Policy` header with `frame-ancestors 'self' https://app.ngfsystems.com https://*.vercel.app`.
 
 ---
 
