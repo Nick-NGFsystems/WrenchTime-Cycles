@@ -4,7 +4,7 @@ import { db } from '@/lib/db'
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { name, email, phone, bikeYear, bikeMake, bikeModel, service, description } = body
+    const { name, email, phone, bikeYear, bikeMake, bikeModel, service, description, bikeStarts, location } = body
 
     if (!name || !email || !phone || !bikeYear || !bikeMake || !bikeModel || !service || !description) {
       return NextResponse.json({ success: false, error: 'All fields are required' }, { status: 400 })
@@ -20,6 +20,8 @@ export async function POST(req: NextRequest) {
         bikeModel,
         service,
         description,
+        bikeStarts: bikeStarts ?? null,
+        location: location ?? null,
         status: 'pending',
       },
     })

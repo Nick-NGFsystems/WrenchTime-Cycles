@@ -1,7 +1,10 @@
 export type NgfSiteContent = Record<string, string>
 
 function getDomain() {
-  return process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.NEXT_PUBLIC_SITE_URL || 'localhost:3000'
+  // NEXT_PUBLIC_SITE_URL must come first — it's the custom domain set by Nick in Vercel env vars.
+  // VERCEL_PROJECT_PRODUCTION_URL is the *.vercel.app deployment URL and would not match the
+  // client's custom domain stored in the NGF database.
+  return process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_PROJECT_PRODUCTION_URL || 'localhost:3000'
 }
 
 export async function getNgfContent(): Promise<NgfSiteContent> {
