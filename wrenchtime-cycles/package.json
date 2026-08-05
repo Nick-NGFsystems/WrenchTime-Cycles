@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "prisma generate && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "sync-ngf": "node scripts/sync-ngf.mjs",
+    "sync-ngf:check": "node scripts/sync-ngf.mjs --check",
+    "doctor": "node scripts/ngf-doctor.mjs"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.39.2",

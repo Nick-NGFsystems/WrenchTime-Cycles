@@ -1,17 +1,25 @@
 export type NgfSiteContent = Record<string, string>
 
-function getDomain() {
-  // NEXT_PUBLIC_SITE_URL must come first — it's the custom domain set by Nick in Vercel env vars.
-  // VERCEL_PROJECT_PRODUCTION_URL is the *.vercel.app deployment URL and would not match the
-  // client's custom domain stored in the NGF database.
-  return process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_PROJECT_PRODUCTION_URL || 'localhost:3000'
+function getDomain(): string {
+  const raw = process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_PROJECT_PRODUCTION_URL || 'localhost:3000'
+  return raw.replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/$/, '')
 }
 
+/**
+ * Fetch this site's published content from the NGF portal.
+ * Returns flat dot-notation key-value pairs.
+ * e.g. { 'hero.headline': 'Welcome', 'services.items.0.title': 'Consulting' }
+ */
 export async function getNgfContent(): Promise<NgfSiteContent> {
   try {
-    const domain = getDomain().replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/$/, '')
-    const url = `${process.env.NGF_APP_URL || 'https://app.ngfsystems.com'}/api/public/content?domain=${encodeURIComponent(domain)}`
-    const res = await fetch(url, { cache: 'no-store' })
+    const domain = getDomain()
+    const base = process.env.NGF_APP_URL || 'https://app.ngfsystems.com'
+    const url = `${base}/api/public/content?domain=${encodeURIComponent(domain)}`
+    // Time-based ISR + instant cache-bust on publish (see NGF-STANDARDS
+    // "Content caching & revalidation"). NEVER use cache: 'no-store' — that
+    // hits Neon on every single pageview. The portal's push handler pings this
+    // site's /api/revalidate on publish, which busts this cache immediately.
+    const res = await fetch(url, { next: { revalidate: 60, tags: ['ngf-content'] } })
     if (!res.ok) return {}
     const data = (await res.json()) as { content?: NgfSiteContent }
     return data.content ?? {}
@@ -21,9 +29,21 @@ export async function getNgfContent(): Promise<NgfSiteContent> {
 }
 
 /**
+ * The NGF public API base + this site's domain, for the booking widget (which
+ * calls the public availability/bookings endpoints from the browser). Read on
+ * the server and passed into the client widget as props.
+ */
+export function ngfEndpoints(): { base: string; domain: string } {
+  return {
+    base: process.env.NGF_APP_URL || 'https://app.ngfsystems.com',
+    domain: getDomain(),
+  }
+}
+
+/**
  * Extract a dynamic array of items from flat dot-notation content.
- * e.g. getItems(content, 'how.steps') returns array of objects from keys like
- * 'how.steps.0.title', 'how.steps.1.title', etc.
+ * e.g. getItems(content, 'services.items') returns array of objects from keys like
+ * 'services.items.0.title', 'services.items.1.title', etc.
  */
 export function getItems(content: NgfSiteContent, prefix: string): Record<string, string>[] {
   const prefixDot = prefix + '.'

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { relayLeadToNgf } from '@/lib/ngf-lead'
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,6 +26,13 @@ export async function POST(req: NextRequest) {
         status: 'pending',
       },
     })
+
+    // Additive: also surface this in the client's portal "Form Submissions"
+    // inbox. The row above stays the system of record for the shop's own
+    // service-request workflow — nothing about it changes. relayLeadToNgf never
+    // throws and has a 5s timeout, so a slow or down portal cannot fail an
+    // intake that has already been persisted.
+    await relayLeadToNgf('intake', body)
 
     return NextResponse.json({ success: true, data: request })
   } catch (error) {
